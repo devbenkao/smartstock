@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,7 +11,17 @@ import {
   useColorScheme,
   Platform,
 } from 'react-native';
+
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+const BG_SOURCES = {
+  fridge: require('../../assets/fridge.jpg'),
+  pantry: require('../../assets/pantry.jpg'),
+  supply: require('../../assets/supply.jpg'),
+};
+
+// On web, pass objectFit as an inline CSS prop — RN Web forwards unknown style keys to the DOM
+const BG_IMG_STYLE = Platform.OS === 'web' ? { objectFit: 'contain' } : null;
 import { Ionicons } from '@expo/vector-icons';
 import { getColors, SPACING, RADIUS, FONT } from '../theme';
 import { INVENTORY_ITEMS, getExpirationStatus, getDaysUntilExpiration } from '../data/sampleData';
@@ -22,9 +32,9 @@ const { width: W } = Dimensions.get('window');
 const MODES = ['fridge', 'pantry', 'supply'];
 
 const MODE_CONFIG = {
-  fridge: { label: 'Fridge', emoji: '🧊', bg: require('../../assets/fridge.jpg') },
-  pantry: { label: 'Pantry', emoji: '🫙', bg: require('../../assets/pantry.jpg') },
-  supply: { label: 'Supply', emoji: '📦', bg: require('../../assets/supply.jpg') },
+  fridge: { label: 'Fridge', emoji: '🧊' },
+  pantry: { label: 'Pantry', emoji: '🫙' },
+  supply: { label: 'Supply', emoji: '📦' },
 };
 
 // Web-only blur — applied inline to avoid StyleSheet validation errors on native
@@ -105,6 +115,32 @@ export default function InventoryScreen() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [showDetail, setShowDetail] = useState(false);
 
+  // On web, Animated.Image strips unknown style props so objectFit never reaches the DOM.
+  // After mount, set it directly on every <img> — all img tags here are background images.
+  useEffect(() => {
+    if (Platform.OS !== 'web') return;
+    const fix = () => {
+      document.querySelectorAll('img').forEach(img => {
+        // RN Web sets the Animated.Image wrapper div to the image's natural pixel
+        // dimensions. Override both the wrapper and the img itself.
+        const wrapper = img.parentElement;
+        if (wrapper) {
+          wrapper.style.width = '100%';
+          wrapper.style.height = '100%';
+          wrapper.style.maxWidth = '100vw';
+          wrapper.style.maxHeight = '100vh';
+        }
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'contain';
+        img.style.backgroundColor = '#0A0A0A';
+      });
+    };
+    fix();
+    const t = setTimeout(fix, 150);
+    return () => clearTimeout(t);
+  }, []);
+
   // One opacity value per background — only the active one is 1
   const bgOpacity = useRef({
     fridge: new Animated.Value(1),
@@ -168,8 +204,8 @@ export default function InventoryScreen() {
       {MODES.map(m => (
         <Animated.Image
           key={m}
-          source={MODE_CONFIG[m].bg}
-          style={[styles.bg, { opacity: bgOpacity[m] }]}
+          source={BG_SOURCES[m]}
+          style={[styles.bg, { opacity: bgOpacity[m] }, BG_IMG_STYLE]}
           resizeMode="contain"
         />
       ))}
