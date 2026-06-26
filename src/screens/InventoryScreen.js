@@ -6,26 +6,25 @@ import {
   TouchableOpacity,
   ScrollView,
   Animated,
+  Image,
   StyleSheet,
   Dimensions,
   useColorScheme,
   Platform,
 } from 'react-native';
-
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+
+import { getColors, SPACING, RADIUS, FONT } from '../theme';
+import { INVENTORY_ITEMS, getExpirationStatus, getDaysUntilExpiration } from '../data/sampleData';
+import ItemDetailModal from '../components/ItemDetailModal';
+
 
 const BG_SOURCES = {
   fridge: require('../../assets/fridge.jpg'),
   pantry: require('../../assets/pantry.jpg'),
   supply: require('../../assets/supply.jpg'),
 };
-
-// On web, pass objectFit as an inline CSS prop — RN Web forwards unknown style keys to the DOM
-const BG_IMG_STYLE = Platform.OS === 'web' ? { objectFit: 'contain' } : null;
-import { Ionicons } from '@expo/vector-icons';
-import { getColors, SPACING, RADIUS, FONT } from '../theme';
-import { INVENTORY_ITEMS, getExpirationStatus, getDaysUntilExpiration } from '../data/sampleData';
-import ItemDetailModal from '../components/ItemDetailModal';
 
 const { width: W } = Dimensions.get('window');
 
@@ -115,31 +114,9 @@ export default function InventoryScreen() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [showDetail, setShowDetail] = useState(false);
 
-  // On web, Animated.Image strips unknown style props so objectFit never reaches the DOM.
-  // After mount, set it directly on every <img> — all img tags here are background images.
-  useEffect(() => {
-    if (Platform.OS !== 'web') return;
-    const fix = () => {
-      document.querySelectorAll('img').forEach(img => {
-        // RN Web sets the Animated.Image wrapper div to the image's natural pixel
-        // dimensions. Override both the wrapper and the img itself.
-        const wrapper = img.parentElement;
-        if (wrapper) {
-          wrapper.style.width = '100%';
-          wrapper.style.height = '100%';
-          wrapper.style.maxWidth = '100vw';
-          wrapper.style.maxHeight = '100vh';
-        }
-        img.style.width = '100%';
-        img.style.height = '100%';
-        img.style.objectFit = 'cover';
-        img.style.backgroundColor = '#0A0A0A';
-      });
-    };
-    fix();
-    const t = setTimeout(fix, 150);
-    return () => clearTimeout(t);
-  }, []);
+  // On web, Metro resolves require'd images to URI strings directly.
+  // We can't use Image.resolveAssetSource — react-native-web doesn't implement it.
+  const bgUris = Platform.OS === 'web' ? BG_SOURCES : null;
 
   // One opacity value per background — only the active one is 1
   const bgOpacity = useRef({
@@ -202,12 +179,25 @@ export default function InventoryScreen() {
     <View style={styles.root}>
       {/* Layered background images — crossfade on mode switch */}
       {MODES.map(m => (
-        <Animated.Image
-          key={m}
-          source={BG_SOURCES[m]}
-          style={[styles.bg, { opacity: bgOpacity[m] }, BG_IMG_STYLE]}
-          resizeMode="contain"
-        />
+        Platform.OS === 'web' ? (
+          <Animated.View
+            key={m}
+            style={[
+              styles.bg,
+              { opacity: bgOpacity[m] },
+              bgUris ? {
+                backgroundImage: `url("${bgUris[m].uri || bgUris[m]}")`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+              } : null,
+            ]}
+          />
+        ) : (
+          <Animated.View key={m} style={[styles.bg, { opacity: bgOpacity[m] }]}>
+            <Image source={BG_SOURCES[m]} style={styles.bgImage} resizeMode="cover" />
+          </Animated.View>
+        )
       ))}
 
       {/* Dark scrim so text stays legible */}
@@ -324,6 +314,10 @@ const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#0A0A0A' },
 
   bg: {
+    position: 'absolute',
+    top: 0, left: 0, right: 0, bottom: 0,
+  },
+  bgImage: {
     position: 'absolute',
     top: 0, left: 0, right: 0, bottom: 0,
   },
