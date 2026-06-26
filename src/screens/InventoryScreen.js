@@ -170,7 +170,7 @@ export default function InventoryScreen() {
           key={m}
           source={MODE_CONFIG[m].bg}
           style={[styles.bg, { opacity: bgOpacity[m] }]}
-          resizeMode="cover"
+          resizeMode="contain"
         />
       ))}
 
