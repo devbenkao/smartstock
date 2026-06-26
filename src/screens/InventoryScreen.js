@@ -132,7 +132,7 @@ export default function InventoryScreen() {
         }
         img.style.width = '100%';
         img.style.height = '100%';
-        img.style.objectFit = 'contain';
+        img.style.objectFit = 'cover';
         img.style.backgroundColor = '#0A0A0A';
       });
     };
