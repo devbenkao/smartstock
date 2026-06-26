@@ -1,0 +1,18 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "expo-web",
+      "runtimeExecutable": "/Users/benkao/.nvm/versions/node/v18.17.0/bin/node",
+      "runtimeArgs": [
+        "/Users/benkao/Desktop/claude-projects/home-inventory-app/node_modules/expo/bin/cli",
+        "start",
+        "--web",
+        "--port",
+        "8081"
+      ],
+      "port": 8081,
+      "autoPort": false
+    }
+  ]
+}
