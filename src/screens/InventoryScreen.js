@@ -15,7 +15,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
-import { getColors, SPACING, RADIUS, FONT } from '../theme';
+import { getColors, SPACING, RADIUS, FONT, NAV_BOTTOM_INSET } from '../theme';
 import { INVENTORY_ITEMS, getExpirationStatus, getDaysUntilExpiration } from '../data/sampleData';
 import ItemDetailModal from '../components/ItemDetailModal';
 
@@ -26,7 +26,7 @@ const BG_SOURCES = {
   supply: require('../../assets/supply.jpg'),
 };
 
-const { width: W } = Dimensions.get('window');
+const { width: W, height: H } = Dimensions.get('window');
 
 const MODES = ['fridge', 'pantry', 'supply'];
 
@@ -45,6 +45,10 @@ const BLUR_SM = Platform.OS === 'web'
   ? { backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)' }
   : undefined;
 
+const BLUR_HEAVY = Platform.OS === 'web'
+  ? { backdropFilter: 'blur(40px)', WebkitBackdropFilter: 'blur(40px)' }
+  : undefined;
+
 function expiryBadge(expirationDate) {
   const status = getExpirationStatus(expirationDate);
   const days = getDaysUntilExpiration(expirationDate);
@@ -60,9 +64,17 @@ function GlassItemRow({ item, onPress }) {
     <TouchableOpacity
       onPress={onPress}
       activeOpacity={0.72}
-      style={[styles.glassRow, BLUR]}
+      style={[
+        styles.glassRow,
+        BLUR,
+        Platform.OS !== 'web' && { backgroundColor: 'rgba(255,255,255,0.28)' },
+      ]}
     >
-      <View style={[styles.emojiWrap, BLUR_SM]}>
+      <View style={[
+        styles.emojiWrap,
+        BLUR_SM,
+        Platform.OS !== 'web' && { backgroundColor: 'rgba(255,255,255,0.22)' },
+      ]}>
         <Text style={styles.emoji}>{item.emoji}</Text>
       </View>
       <View style={styles.rowMid}>
@@ -93,7 +105,7 @@ function AttentionBanner({ items }) {
   if (warning.length) parts.push(`${warning.length} expiring soon`);
 
   return (
-    <View style={[styles.attentionBanner, BLUR_SM]}>
+    <View style={[styles.attentionBanner, BLUR_HEAVY]}>
       <Ionicons name="time-outline" size={14} color="#FF9F0A" />
       <Text style={styles.attentionText}>{parts.join(' · ')}</Text>
       <View style={styles.attentionEmojis}>
@@ -195,7 +207,7 @@ export default function InventoryScreen() {
           />
         ) : (
           <Animated.View key={m} style={[styles.bg, { opacity: bgOpacity[m] }]}>
-            <Image source={BG_SOURCES[m]} style={styles.bgImage} resizeMode="cover" />
+            <Image source={BG_SOURCES[m]} style={{ width: W, height: H }} resizeMode="cover" />
           </Animated.View>
         )
       ))}
@@ -214,7 +226,7 @@ export default function InventoryScreen() {
 
         {/* Environment toggle — slides with spring */}
         <View style={styles.toggleWrap}>
-          <View style={[styles.toggleTrack, BLUR]}>
+          <View style={[styles.toggleTrack, BLUR_HEAVY]}>
             <Animated.View
               style={[
                 styles.pillIndicator,
@@ -273,8 +285,8 @@ export default function InventoryScreen() {
             ))
           )}
 
-          {/* Spacer so last item clears the pinned search bar */}
-          <View style={{ height: 90 }} />
+          {/* Spacer so last item clears the pinned search bar + floating nav bar */}
+          <View style={{ height: NAV_BOTTOM_INSET + 80 }} />
         </ScrollView>
 
         {/* Search bar pinned at bottom of the environment */}
@@ -361,10 +373,10 @@ const styles = StyleSheet.create({
   },
   toggleTrack: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: 'rgba(0,0,0,0.55)',
     borderRadius: RADIUS.full,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.18)',
+    borderColor: 'rgba(255,255,255,0.25)',
     position: 'relative',
     overflow: 'hidden',
   },
@@ -400,9 +412,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: SPACING.sm,
-    backgroundColor: 'rgba(255,149,0,0.14)',
+    backgroundColor: 'rgba(160,75,0,0.72)',
     borderWidth: 1,
-    borderColor: 'rgba(255,149,0,0.32)',
+    borderColor: 'rgba(255,160,0,0.6)',
     borderRadius: RADIUS.lg,
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.sm + 1,
@@ -431,7 +443,7 @@ const styles = StyleSheet.create({
     gap: SPACING.md,
     backgroundColor: 'rgba(255,255,255,0.11)',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
+    borderColor: 'rgba(255,255,255,0.45)',
     borderRadius: RADIUS.card,
     padding: SPACING.md,
     marginBottom: SPACING.sm,
@@ -474,7 +486,7 @@ const styles = StyleSheet.create({
   searchWrap: {
     paddingHorizontal: SPACING.lg,
     paddingTop: SPACING.sm,
-    paddingBottom: SPACING.md,
+    paddingBottom: NAV_BOTTOM_INSET,
   },
   searchBar: {
     flexDirection: 'row',

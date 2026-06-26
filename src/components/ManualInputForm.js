@@ -10,7 +10,7 @@ import {
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { getColors, SPACING, RADIUS, FONT, SHADOW } from '../theme';
+import { getColors, SPACING, RADIUS, FONT, SHADOW, NAV_BOTTOM_INSET } from '../theme';
 
 const CATEGORIES = [
   { key: 'fridge', label: 'Fridge', emoji: '🧊' },
@@ -63,7 +63,7 @@ export default function ManualInputForm({ isDark, onSave, onCancel }) {
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={[styles.content, { paddingBottom: 60 }]}
+        contentContainerStyle={[styles.content, { paddingBottom: NAV_BOTTOM_INSET }]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >

@@ -12,7 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { getColors, SPACING, RADIUS, FONT, SHADOW } from '../theme';
+import { getColors, SPACING, RADIUS, FONT, SHADOW, NAV_BOTTOM_INSET } from '../theme';
 import ManualInputForm from '../components/ManualInputForm';
 
 const { width: W } = Dimensions.get('window');
@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingBottom: SPACING.lg,
+    paddingBottom: NAV_BOTTOM_INSET,
   },
   typeRow: {
     flexDirection: 'row',

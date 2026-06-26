@@ -13,7 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { getColors, SPACING, RADIUS, FONT, SHADOW } from '../theme';
+import { getColors, SPACING, RADIUS, FONT, SHADOW, NAV_BOTTOM_INSET } from '../theme';
 import { INVENTORY_ITEMS, getExpirationStatus, getDaysUntilExpiration, formatDate } from '../data/sampleData';
 
 const { width: W } = Dimensions.get('window');
@@ -230,7 +230,7 @@ export default function DashboardScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  scroll: { paddingBottom: 40 },
+  scroll: { paddingBottom: NAV_BOTTOM_INSET },
   profileHero: {
     flexDirection: 'row',
     alignItems: 'center',

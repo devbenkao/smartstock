@@ -122,6 +122,13 @@ export const FONT = {
   },
 };
 
+// Total screen space (from bottom edge) occupied by the floating nav bar pill
+export const NAV_BOTTOM_INSET = Platform.select({
+  ios: 104,     // 28 (bottom offset) + 68 (pill) + 8 (breathing)
+  android: 92,  // 16 (bottom offset) + 68 (pill) + 8 (breathing)
+  default: 92,
+});
+
 export const SHADOW = {
   card: Platform.select({
     ios: {

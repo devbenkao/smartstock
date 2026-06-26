@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Platform, useColorScheme, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Platform, useColorScheme, TouchableOpacity } from 'react-native';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -8,7 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import ScanScreen from './src/screens/ScanScreen';
 import InventoryScreen from './src/screens/InventoryScreen';
 import DashboardScreen from './src/screens/DashboardScreen';
-import { getColors, FONT, RADIUS, SHADOW } from './src/theme';
+import { getColors, RADIUS, SHADOW } from './src/theme';
 
 const Tab = createBottomTabNavigator();
 
@@ -24,42 +24,39 @@ function CustomTabBar({ state, navigation }) {
   const colors = getColors(isDark);
 
   return (
-    <View style={[styles.tabBar, { backgroundColor: colors.tabBar }, SHADOW.tab]}>
-      {state.routes.map((route, index) => {
-        const focused = state.index === index;
-        const cfg = TAB_CONFIG[route.name];
+    <View style={styles.tabBarContainer} pointerEvents="box-none">
+      <View
+        style={[
+          styles.tabBar,
+          {
+            backgroundColor: isDark ? 'rgba(22,18,14,0.90)' : 'rgba(252,248,242,0.90)',
+            borderColor: isDark ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.07)',
+          },
+          SHADOW.float,
+        ]}
+      >
+        {state.routes.map((route, index) => {
+          const focused = state.index === index;
+          const cfg = TAB_CONFIG[route.name];
 
-        return (
-          <TouchableOpacity
-            key={route.key}
-            style={styles.tabItem}
-            onPress={() => navigation.navigate(route.name)}
-            activeOpacity={0.75}
-          >
-            <View
-              style={[
-                styles.tabPill,
-                focused && { backgroundColor: colors.primaryLight },
-              ]}
+          return (
+            <TouchableOpacity
+              key={route.key}
+              style={styles.tabItem}
+              onPress={() => navigation.navigate(route.name)}
+              activeOpacity={0.75}
             >
-              <Ionicons
-                name={focused ? cfg.iconActive : cfg.icon}
-                size={22}
-                color={focused ? colors.primary : colors.textTertiary}
-              />
-              <Text
-                style={[
-                  styles.tabLabel,
-                  { color: focused ? colors.primary : colors.textTertiary },
-                  focused && { fontWeight: FONT.weight.semibold },
-                ]}
-              >
-                {cfg.label}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        );
-      })}
+              <View style={[styles.tabIcon, focused && { backgroundColor: colors.primary }]}>
+                <Ionicons
+                  name={focused ? cfg.iconActive : cfg.icon}
+                  size={22}
+                  color={focused ? '#FFFFFF' : colors.textTertiary}
+                />
+              </View>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
     </View>
   );
 }
@@ -99,27 +96,30 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
+  tabBarContainer: {
+    position: 'absolute',
+    bottom: Platform.OS === 'ios' ? 28 : 16,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
   tabBar: {
     flexDirection: 'row',
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: Platform.OS === 'ios' ? 28 : 12,
-    borderTopWidth: 0,
+    borderRadius: RADIUS.full,
+    borderWidth: 1,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
+    gap: 4,
   },
   tabItem: {
-    flex: 1,
     alignItems: 'center',
+    justifyContent: 'center',
   },
-  tabPill: {
-    alignItems: 'center',
-    paddingVertical: 6,
-    paddingHorizontal: 18,
+  tabIcon: {
+    width: 52,
+    height: 52,
     borderRadius: RADIUS.full,
-    gap: 3,
-  },
-  tabLabel: {
-    fontSize: FONT.size.xs,
-    fontWeight: FONT.weight.medium,
-    letterSpacing: 0.1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

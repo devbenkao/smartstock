@@ -3,7 +3,7 @@
   "configurations": [
     {
       "name": "expo-web",
-      "runtimeExecutable": "/Users/benkao/.nvm/versions/node/v18.17.0/bin/node",
+      "runtimeExecutable": "/Users/benkao/.nvm/versions/node/v20.20.2/bin/node",
       "runtimeArgs": [
         "/Users/benkao/Desktop/claude-projects/home-inventory-app/node_modules/expo/bin/cli",
         "start",
